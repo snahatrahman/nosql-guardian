@@ -1,4 +1,5 @@
 const validateTypes = require("./validators/typeValidator");
+const validateStructure = require("./validators/structureValidator");
 const runOperatorDetection = require("./validators/operatorDetector");
 const logBlockedRequest = require("./logger");
 
@@ -8,12 +9,29 @@ function nosqlGuardian(schema) {
   return function (req, res, next) {
     const data = req.body || {};
 
+    // 1. Validate data types
     const typeIssues = validateTypes(data, schema);
+
+    // 2. Validate query structure / nesting
+    const structureIssues = validateStructure(data, schema);
+
+    // 3. Detect NoSQL operators
     const operatorIssues = runOperatorDetection(data, schema);
 
-    const allIssues = [...typeIssues, ...operatorIssues];
-    const riskScore = allIssues.reduce((sum, issue) => sum + issue.points, 0);
+    // Combine all detected issues
+    const allIssues = [
+      ...typeIssues,
+      ...structureIssues,
+      ...operatorIssues
+    ];
 
+    // Calculate total risk score
+    const riskScore = allIssues.reduce(
+      (sum, issue) => sum + issue.points,
+      0
+    );
+
+    // Block request if risk score reaches threshold
     if (riskScore >= RISK_THRESHOLD) {
       logBlockedRequest({
         path: req.originalUrl,
@@ -30,6 +48,7 @@ function nosqlGuardian(schema) {
       });
     }
 
+    // Request is safe
     next();
   };
 }
