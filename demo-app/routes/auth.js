@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const nosqlGuardian = require("../../middleware/nosqlGuardian");
+const { loginSchema } = require("../../config/schemas");
 
-// ⚠️ VULNERABLE LOGIN ROUTE — no input type validation
-// This route directly passes req.body values into the MongoDB query,
-// which makes it exploitable via NoSQL injection (e.g. { "$ne": null } payloads)
-router.post("/login", async (req, res) => {
+router.post("/login", nosqlGuardian(loginSchema), async (req, res) => {
   const { username, password } = req.body;
 
   try {
