@@ -83,12 +83,7 @@ It is schema-driven, so it can be attached to any route in any Node.js + Express
 Requests scoring 10 or above are rejected.
 
 ## Test Users (seeded)
-
-| Username | Password |
-|---|---|
-| admin | SuperSecret123! |
-| snahat | MyRealPassword456 |
-| testuser | test1234 |
+Demo accounts are set up locally when the demo app is seeded; no usernames or passwords are published here.
 
 ## Test Products (seeded)
 
